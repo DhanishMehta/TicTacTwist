@@ -90,15 +90,3 @@ src/
 * Animation by [Framer Motion](https://www.framer.com/motion/)
 
 ---
-
-🌀 **TicTacTwist** — classic logic with a strategic twist!
-
-```
-
----
-
-Let me know if you’d like help:
-- Writing a `CONTRIBUTING.md` file
-- Deploying to Netlify
-- Creating a demo GIF or badge for your repo header
-```
