@@ -1,69 +1,104 @@
-# React + TypeScript + Vite
+# 🎮 TicTacTwist
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**TicTacTwist** is a modern, responsive, and animated web game that reimagines classic Tic Tac Toe with six exciting variants — all built with React, TypeScript, and Tailwind CSS, and deployed seamlessly via Netlify.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## Expanding the ESLint configuration
+- 🧠 **Classic Tic Tac Toe** – the timeless 3x3 grid game
+- 🌌 **Ultimate Tic Tac Toe** – 3x3 grid of boards for layered strategy
+- 🧊 **3D Tic Tac Toe** – cube-style play with depth and dimension
+- 🚫 **Misère Mode** – try not to win! First to get 3 in a row loses
+- 🔁 **Wild Mode** – choose either X or O each turn, chaos reigns
+- 🧩 **Gomoku** – get 5 in a row on a 15×15 grid
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Each mode includes:
+- 🎨 Clean UI with Tailwind CSS
+- 🔄 Smooth transitions and result overlays using Framer Motion
+- 🎉 Confetti on wins
+- 🧭 Clear instructions per mode
+- 📱 Fully responsive layout
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## 🛠️ Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- ⚛️ [React](https://reactjs.org/)
+- 🔷 [TypeScript](https://www.typescriptlang.org/)
+- 💨 [Tailwind CSS](https://tailwindcss.com/)
+- 🎞 [Framer Motion](https://www.framer.com/motion/)
+- 🎉 [react-confetti](https://www.npmjs.com/package/react-confetti)
+- 📦 [react-router-dom](https://reactrouter.com/)
+- 🪄 [Lucide Icons](https://lucide.dev/icons/)
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/your-username/tictactwist.git
+cd tictactwist
+````
+
+### 2. Install dependencies
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 3. Run the development server
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+npm run dev
+```
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Visit [http://localhost:5173](http://localhost:5173) in your browser.
+
+---
+
+## 🌐 Deployment
+
+This project is built for **frontend-only deployment** and works great on platforms like:
+
+* [Netlify](https://www.netlify.com/)
+* [Vercel](https://vercel.com/)
+* [GitHub Pages](https://pages.github.com/)
+
+---
+
+## 📁 Folder Structure
+
+```bash
+src/
+├── components/         # Game variant selector and shared UI
+├── games/              # All game variant components
+├── utils/              # Game logic and helper functions
+├── App.tsx             # Main app with routing
+├── main.tsx            # Entry point
+└── index.css           # Tailwind styles
+```
+
+---
+
+## 🙌 Credits
+
+* Game logic inspired by various classic board game mechanics
+* Icons by [Lucide.dev](https://lucide.dev/)
+* Animation by [Framer Motion](https://www.framer.com/motion/)
+
+---
+
+🌀 **TicTacTwist** — classic logic with a strategic twist!
+
+```
+
+---
+
+Let me know if you’d like help:
+- Writing a `CONTRIBUTING.md` file
+- Deploying to Netlify
+- Creating a demo GIF or badge for your repo header
 ```
