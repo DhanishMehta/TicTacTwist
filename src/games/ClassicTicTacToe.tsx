@@ -10,7 +10,7 @@ const initialBoard: ("X" | "O" | null)[] = Array(9).fill(null);
 const ClassicTicTacToe: React.FC = () => {
   const [board, setBoard] = useState(initialBoard);
   const [isXTurn, setIsXTurn] = useState(true);
-  const [showResult, setShowResult] = useState(false);
+  const [, setShowResult] = useState(false);
   const { width, height } = useWindowSize();
 
   const winner = checkWinner(board);
