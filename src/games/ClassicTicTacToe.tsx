@@ -10,11 +10,6 @@ type Player = "X" | "O";
 type Cell = Player | null;
 type Board = Cell[];
 
-type GameResult = {
-  winner: Player | "Draw" | null;
-  line: number[] | null;
-};
-
 const initialBoard: Board = Array(9).fill(null);
 
 const ClassicTicTacToe: React.FC = (): JSX.Element => {
