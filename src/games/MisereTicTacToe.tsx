@@ -1,126 +1,125 @@
 import React, { useState, useEffect, type JSX } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import Confetti from 'react-confetti';
 import useWindowSize from 'react-use/lib/useWindowSize';
-import { checkWinnerClassic, type GameResult, type Board, type Player } from '../utils/checkWinnerClassic';
 
-const initialBoard: Board = Array(9).fill(null);
+import { checkWinnerClassic } from '../utils/checkWinnerClassic';
+
+type Player = 'X' | 'O';
+type Cell = Player | null;
+
+type GameState = Cell[];
 
 const MisereTicTacToe: React.FC = (): JSX.Element => {
-  const [board, setBoard] = useState<Board>(initialBoard);
+  const getLineStyle = (line: number[]): React.CSSProperties => {
+    const lineMap: { [key: string]: React.CSSProperties } = {
+      '0,1,2': { top: '16.66%', left: 0, width: '100%', height: '4px' },
+      '3,4,5': { top: '50%', left: 0, width: '100%', height: '4px' },
+      '6,7,8': { bottom: '16.66%', left: 0, width: '100%', height: '4px' },
+      '0,3,6': { top: 0, left: '16.66%', width: '4px', height: '100%' },
+      '1,4,7': { top: 0, left: '50%', width: '4px', height: '100%' },
+      '2,5,8': { top: 0, right: '16.66%', width: '4px', height: '100%' },
+      '0,4,8': { top: 0, left: 0, width: '100%', height: '4px', transform: 'rotate(45deg)', transformOrigin: 'top left' },
+      '2,4,6': { top: 0, right: 0, width: '100%', height: '4px', transform: 'rotate(-45deg)', transformOrigin: 'top right' },
+    };
+    return lineMap[line.join(',')] || {};
+  };
+  const [board, setBoard] = useState<GameState>(Array(9).fill(null));
   const [isXTurn, setIsXTurn] = useState<boolean>(true);
-  const [loser, setLoser] = useState<Player | "Draw" | null>(null);
+  const [loser, setLoser] = useState<Player | 'Draw' | null>(null);
   const [losingLine, setLosingLine] = useState<number[] | null>(null);
-  const [clickedIndex, setClickedIndex] = useState<number | null>(null);
-  const [showOverlay, setShowOverlay] = useState(false);
-  useWindowSize();
+  const [showOverlay, setShowOverlay] = useState<boolean>(false);
+  const [showRules, setShowRules] = useState<boolean>(false);
+  const { width, height } = useWindowSize();
 
   const handleClick = (index: number): void => {
     if (board[index] || loser) return;
+
     const newBoard = [...board];
-    const currentPlayer = isXTurn ? "X" : "O";
-    newBoard[index] = currentPlayer;
+    newBoard[index] = isXTurn ? 'X' : 'O';
+    const result = checkWinnerClassic(newBoard);
 
-    const result: GameResult = checkWinnerClassic(newBoard);
-
-    if (result.winner) {
-      // In Misère, if someone makes 3-in-a-row, they lose
-      setLoser(currentPlayer);
+    setBoard(newBoard);
+    setIsXTurn(!isXTurn);
+    if (result.winner && result.winner !== 'Draw') {
+      setLoser(result.winner);
       setLosingLine(result.line);
-    } else if (newBoard.every(cell => cell !== null)) {
-      setLoser("Draw");
     }
-
-    setClickedIndex(index);
-    setTimeout(() => {
-      setBoard(newBoard);
-      setIsXTurn(!isXTurn);
-      setClickedIndex(null);
-    }, 100);
+    if (result.winner === 'Draw') {
+      setLoser('Draw');
+      setLosingLine(null);
+    }
   };
 
   useEffect(() => {
-    if (loser && (loser === 'Draw' || losingLine)) {
+    if (loser) {
       const timeout = setTimeout(() => setShowOverlay(true), 1000);
       return () => clearTimeout(timeout);
     }
-  }, [loser, losingLine]);
+  }, [loser]);
 
   const resetGame = (): void => {
-    setBoard(initialBoard);
+    setBoard(Array(9).fill(null));
     setIsXTurn(true);
     setLoser(null);
-    setLosingLine(null);
-    setClickedIndex(null);
     setShowOverlay(false);
-  };
-
-  const getCellCenterPercent = (index: number): { x: number; y: number } => {
-    const col = index % 3;
-    const row = Math.floor(index / 3);
-    return {
-      x: col * 33.333 + 16.666,
-      y: row * 33.333 + 16.666
-    };
+    setLosingLine(null);
   };
 
   const loserPlayer = loser === 'X' ? 'Player 1' : loser === 'O' ? 'Player 2' : null;
 
   return (
-    <div className="text-center pt-6 relative h-full w-full">
-      <h2 className="text-2xl font-semibold mb-2">Misère Tic Tac Toe</h2>
+    <div className="text-center p-6 relative h-full w-full overflow-auto">
+      <h2 className="text-2xl font-semibold mb-4">Misère Tic Tac Toe</h2>
+      <p className="text-lg font-medium text-gray-700 mb-4">Current Turn: <span className="text-blue-600">{isXTurn ? 'Player 1 (X)' : 'Player 2 (O)'}</span></p>
 
-      <div className="grid grid-cols-3 gap-2 justify-center max-w-xs mx-auto mb-6 relative">
-        {board.map((cell, index) => (
+      <button
+        onClick={() => setShowRules(true)}
+        className="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Show Rules
+      </button>
+
+      <div className="relative grid grid-cols-3 gap-3 justify-center mx-auto max-w-xs aspect-square">
+        {board.map((cell, idx) => (
           <motion.div
-            key={index}
-            onClick={(): void => handleClick(index)}
+            key={idx}
+            onClick={() => handleClick(idx)}
             whileTap={{ scale: 0.9 }}
-            className={`w-24 h-24 bg-gray-200 flex items-center justify-center text-3xl font-bold cursor-pointer transition duration-150
-              ${clickedIndex === index ? 'ring-2 ring-red-400' : ''}
-              hover:bg-gray-300`}
+            className="aspect-square w-full bg-gray-200 flex items-center justify-center text-3xl font-bold cursor-pointer hover:bg-gray-300"
           >
             {cell}
           </motion.div>
         ))}
-
-        {losingLine && (
-          <svg className="absolute top-0 left-0 w-full h-full z-10 pointer-events-none">
-            {(() => {
-              const start = getCellCenterPercent(losingLine[0]);
-              const end = getCellCenterPercent(losingLine[2]);
-              return (
-                <line
-                  x1={`${start.x}%`}
-                  y1={`${start.y}%`}
-                  x2={`${end.x}%`}
-                  y2={`${end.y}%`}
-                  stroke="red"
-                  strokeWidth={10}
-                  strokeLinecap="round"
-                  style={{
-                    strokeDasharray: 300,
-                    strokeDashoffset: 300,
-                    animation: 'drawLine 1s forwards ease-out'
-                  }}
-                />
-              );
-            })()}
-          </svg>
+      {losingLine && (
+          <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+            <motion.div
+              className="absolute bg-red-500"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.5 }}
+              style={{
+                transformOrigin: 'left',
+                ...getLineStyle(losingLine),
+              }}
+            />
+          </div>
         )}
       </div>
-
-      <button
-        onClick={resetGame}
-        className="mr-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition"
-      >
-        Restart
-      </button>
-      <Link to="/">
-        <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition">
-          Back to Menu
+      <div className="mt-6">
+        <button
+          onClick={resetGame}
+          className="mr-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Restart
         </button>
-      </Link>
+        <Link to="/">
+          <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+            Back to Menu
+          </button>
+        </Link>
+      </div>
 
       <AnimatePresence>
         {loser && showOverlay && (
@@ -130,20 +129,19 @@ const MisereTicTacToe: React.FC = (): JSX.Element => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
+            {loser !== 'Draw' && <Confetti width={width} height={height} />} 
             <motion.h3
               className="text-3xl font-bold mb-6"
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
             >
-              {loser === 'Draw'
-                ? "🤝 It's a draw!"
-                : `💀 ${loserPlayer} loses the game`}
+              {loser === 'Draw' ? "🤝 It's a draw!" : `💀 Loser: ${loserPlayer}`}
             </motion.h3>
             <button
               onClick={resetGame}
-              className="mb-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-6 rounded"
+              className="mb-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-6 rounded"
             >
-              Try Again
+              Play Again
             </button>
             <Link to="/">
               <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded">
@@ -152,17 +150,35 @@ const MisereTicTacToe: React.FC = (): JSX.Element => {
             </Link>
           </motion.div>
         )}
-      </AnimatePresence>
 
-      <style>
-        {`
-          @keyframes drawLine {
-            to {
-              stroke-dashoffset: 0;
-            }
-          }
-        `}
-      </style>
+        {showRules && (
+          <motion.div
+            className="fixed inset-0 z-30 bg-black/70 flex flex-col items-center justify-center text-white p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="bg-white text-black p-6 rounded-lg max-w-xl text-left">
+              <h3 className="text-2xl font-bold mb-4">How to Play Misère Tic Tac Toe</h3>
+              <ul className="list-disc pl-6 space-y-2">
+                <li>This is the inverse of classic Tic Tac Toe.</li>
+                <li>Two players alternate marking the spaces in a 3×3 grid with X and O.</li>
+                <li>The first player to get three in a row **loses** the game.</li>
+                <li>If all squares are filled and no three-in-a-row occurs, the game ends in a draw.</li>
+                <li>Player 1 starts with X, Player 2 plays with O.</li>
+              </ul>
+              <div className="text-center mt-6">
+                <button
+                  onClick={() => setShowRules(false)}
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
+                >
+                  Got it!
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
